@@ -14,3 +14,5 @@
     invisibles: {}
     showInvisibles: true
   "custom-title": {}
+  tabs:
+    usePreviewTabs: true
