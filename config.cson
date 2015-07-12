@@ -16,3 +16,10 @@
   "custom-title": {}
   tabs:
     usePreviewTabs: true
+  "trailing-spaces":
+    enableForCursorLines: true
+    enableForIndentation: true
+  whitespace:
+    ignoreWhitespaceOnCurrentLine: false
+  "git-diff":
+    showIconsInEditorGutter: true
