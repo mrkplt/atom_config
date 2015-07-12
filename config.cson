@@ -1,0 +1,16 @@
+"*":
+  "exception-reporting":
+    userId: "245b978d-b696-a225-fc21-88c901bb05fc"
+  welcome:
+    showOnStartup: false
+  core:
+    themes: [
+      "atom-dark-ui"
+      "base16-tomorrow-dark-theme"
+    ]
+    audioBeep: false
+  editor:
+    fontFamily: "Fira Mono OT"
+    invisibles: {}
+    showInvisibles: true
+  "custom-title": {}
