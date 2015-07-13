@@ -23,3 +23,5 @@
     ignoreWhitespaceOnCurrentLine: false
   "git-diff":
     showIconsInEditorGutter: true
+  "git-history": {}
+  "atom-terminal": {}
