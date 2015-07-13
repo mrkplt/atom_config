@@ -4,16 +4,16 @@
   welcome:
     showOnStartup: false
   core:
-    themes: [
-      "atom-dark-ui"
-      "base16-tomorrow-dark-theme"
-    ]
     audioBeep: false
+    themes: [
+      "solarized-dark-ui"
+      "solarized-dark-syntax"
+    ]
   editor:
-    fontFamily: "Fira Mono OT"
     invisibles: {}
     showInvisibles: true
     fontSize: 16
+    fontFamily: "Fira Mono OT"
   "custom-title": {}
   tabs:
     usePreviewTabs: true
