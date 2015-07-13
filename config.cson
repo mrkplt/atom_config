@@ -13,6 +13,7 @@
     fontFamily: "Fira Mono OT"
     invisibles: {}
     showInvisibles: true
+    fontSize: 16
   "custom-title": {}
   tabs:
     usePreviewTabs: true
