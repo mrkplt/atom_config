@@ -6,13 +6,12 @@
   core:
     audioBeep: false
     themes: [
-      "solarized-dark-ui"
+      "one-dark-ui"
       "solarized-dark-syntax"
     ]
   editor:
     invisibles: {}
     showInvisibles: true
-    fontSize: 16
     fontFamily: "Fira Mono OT"
   "custom-title": {}
   tabs:
@@ -26,3 +25,6 @@
     showIconsInEditorGutter: true
   "git-history": {}
   "atom-terminal": {}
+  "tree-view":
+    hideIgnoredNames: true
+    hideVcsIgnoredFiles: true
