@@ -27,4 +27,3 @@
   "atom-terminal": {}
   "tree-view":
     hideIgnoredNames: true
-    hideVcsIgnoredFiles: true
