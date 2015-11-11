@@ -27,3 +27,7 @@
   "atom-terminal": {}
   "tree-view":
     hideIgnoredNames: true
+  "atom-ctags":
+    cmdArgs: "--exclude=.git --exclude=data"
+    buildTimeout: 60000
+  "git-blame": {}
