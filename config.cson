@@ -1,33 +1,34 @@
 "*":
-  "exception-reporting":
-    userId: "245b978d-b696-a225-fc21-88c901bb05fc"
-  welcome:
-    showOnStartup: false
+  "atom-ctags":
+    buildTimeout: 60000
+    cmdArgs: "--exclude=.git --exclude=data"
+  "atom-terminal": {}
   core:
     audioBeep: false
     themes: [
       "one-dark-ui"
       "solarized-dark-syntax"
     ]
+  "custom-title": {}
   editor:
+    fontFamily: "Fira Mono OT"
+    fontSize: 12
     invisibles: {}
     showInvisibles: true
-    fontFamily: "Fira Mono OT"
-  "custom-title": {}
+  "exception-reporting":
+    userId: "245b978d-b696-a225-fc21-88c901bb05fc"
+  "git-blame": {}
+  "git-diff":
+    showIconsInEditorGutter: true
+  "git-history": {}
   tabs:
     usePreviewTabs: true
   "trailing-spaces":
     enableForCursorLines: true
     enableForIndentation: true
-  whitespace:
-    ignoreWhitespaceOnCurrentLine: false
-  "git-diff":
-    showIconsInEditorGutter: true
-  "git-history": {}
-  "atom-terminal": {}
   "tree-view":
     hideIgnoredNames: true
-  "atom-ctags":
-    cmdArgs: "--exclude=.git --exclude=data"
-    buildTimeout: 60000
-  "git-blame": {}
+  welcome:
+    showOnStartup: false
+  whitespace:
+    ignoreWhitespaceOnCurrentLine: false
