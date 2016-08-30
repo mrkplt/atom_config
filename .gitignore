@@ -2,4 +2,5 @@ storage
 compile-cache
 dev
 .npm
-.node-gyp
+.node-gypi
+blob-store/*
