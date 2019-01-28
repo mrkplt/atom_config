@@ -13,8 +13,17 @@ describe "Elixir grammar", ->
     expect(grammar.scopeName).toBe "source.elixir"
 
   it "tokenizes underscore variables as comments", ->
-    {tokens} = grammar.tokenizeLine('_some_variable')
-    expect(tokens[0]).toEqual value: '_some_variable', scopes: ['source.elixir', 'comment.elixir']
+    {tokens} = grammar.tokenizeLine('_some_variable?')
+    expect(tokens[0]).toEqual value: '_some_variable?', scopes: ['source.elixir', 'unused.comment.elixir']
+
+    {tokens} = grammar.tokenizeLine('some_variable')
+    expect(tokens[0]).toEqual value: 'some_variable', scopes: ['source.elixir']
+
+  it "tokenizes underscore as wildcard variable", ->
+    {tokens} = grammar.tokenizeLine('this _ other_thing')
+    expect(tokens[0]).not.toEqual value: 'this ', scopes: ['source.elixir', 'wildcard.comment.elixir']
+    expect(tokens[1]).toEqual value: '_', scopes: ['source.elixir', 'wildcard.comment.elixir']
+    expect(tokens[2]).not.toEqual value: ' other_thing', scopes: ['source.elixir', 'wildcard.comment.elixir']
 
     {tokens} = grammar.tokenizeLine('some_variable')
     expect(tokens[0]).toEqual value: 'some_variable', scopes: ['source.elixir']
@@ -70,6 +79,9 @@ describe "Elixir grammar", ->
   it "tokenizes other operators", ->
     {tokens} = grammar.tokenizeLine('left |> right')
     expect(tokens[1]).toEqual value: '|>', scopes: ['source.elixir', 'keyword.operator.other.elixir']
+
+    {tokens} = grammar.tokenizeLine('left | right')
+    expect(tokens[1]).toEqual value: '|', scopes: ['source.elixir', 'keyword.operator.other.elixir']
 
     {tokens} = grammar.tokenizeLine('left ++ right')
     expect(tokens[1]).toEqual value: '++', scopes: ['source.elixir', 'keyword.operator.other.elixir']
@@ -142,6 +154,42 @@ describe "Elixir grammar", ->
     {tokens} = grammar.tokenizeLine('case: case')
     expect(tokens[0]).toEqual value: 'case', scopes: ['source.elixir', 'constant.other.symbol.elixir']
     expect(tokens[1]).toEqual value: ':', scopes: ['source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir']
+
+    {tokens} = grammar.tokenizeLine(':"symbol"')
+    expect(tokens[0]).toEqual value: ':"', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir', 'punctuation.definition.constant.elixir']
+    expect(tokens[1]).toEqual value: 'symbol', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir']
+    expect(tokens[2]).toEqual value: '"', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir', 'punctuation.definition.constant.elixir']
+
+    {tokens} = grammar.tokenizeLine('"symbol as key":')
+    expect(tokens[0]).toEqual value: '"', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir', 'punctuation.definition.constant.elixir']
+    expect(tokens[1]).toEqual value: 'symbol as key', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir']
+    expect(tokens[2]).toEqual value: '":', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir', 'punctuation.definition.constant.elixir']
+
+    {tokens} = grammar.tokenizeLine('"symbol as key with unescaped " inside":')
+    expect(tokens[0]).toEqual value: '"', scopes: ['source.elixir', 'string.quoted.double.elixir', 'punctuation.definition.string.begin.elixir']
+    expect(tokens[1]).toEqual value: 'symbol as key with unescaped ', scopes: ['source.elixir', 'string.quoted.double.elixir']
+    expect(tokens[2]).toEqual value: '"', scopes: ['source.elixir', 'string.quoted.double.elixir', 'punctuation.definition.string.end.elixir']
+    expect(tokens[3]).toEqual value: ' inside', scopes: ['source.elixir']
+    expect(tokens[4]).toEqual value: '"', scopes: ['source.elixir', 'string.quoted.double.elixir', 'punctuation.definition.string.begin.elixir']
+    expect(tokens[5]).toEqual value: ':', scopes: ['source.elixir', 'string.quoted.double.elixir']
+
+    {tokens} = grammar.tokenizeLine('"symbol as key with escaped \\" inside":')
+    expect(tokens[1]).toEqual value: 'symbol as key with escaped ', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir']
+    expect(tokens[2]).toEqual value: '\\"', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir', 'constant.character.escape.elixir']
+    expect(tokens[3]).toEqual value: ' inside', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir']
+    expect(tokens[4]).toEqual value: '":', scopes: ['source.elixir', 'constant.other.symbol.double-quoted.elixir', 'punctuation.definition.constant.elixir']
+
+    {tokens} = grammar.tokenizeLine("'charlist as key':")
+    expect(tokens[0]).toEqual value: "'", scopes: ['source.elixir', 'constant.other.symbol.single-quoted.elixir', 'punctuation.definition.constant.elixir']
+    expect(tokens[1]).toEqual value: 'charlist as key', scopes: ['source.elixir', 'constant.other.symbol.single-quoted.elixir']
+    expect(tokens[2]).toEqual value: "':", scopes: ['source.elixir', 'constant.other.symbol.single-quoted.elixir', 'punctuation.definition.constant.elixir']
+
+    {tokens} = grammar.tokenizeLine("'charlist as key with escaped \\' inside':")
+    expect(tokens[0]).toEqual value: "'", scopes: ['source.elixir', 'constant.other.symbol.single-quoted.elixir', 'punctuation.definition.constant.elixir']
+    expect(tokens[1]).toEqual value: 'charlist as key with escaped ', scopes: ['source.elixir', 'constant.other.symbol.single-quoted.elixir']
+    expect(tokens[2]).toEqual value: "\\'", scopes: ['source.elixir', 'constant.other.symbol.single-quoted.elixir', 'constant.character.escape.elixir']
+    expect(tokens[3]).toEqual value: " inside", scopes: ['source.elixir', 'constant.other.symbol.single-quoted.elixir']
+    expect(tokens[4]).toEqual value: "':", scopes: ['source.elixir', 'constant.other.symbol.single-quoted.elixir', 'punctuation.definition.constant.elixir']
 
   it "tokenizes comments", ->
     {tokens} = grammar.tokenizeLine("# TODO: stuff")
@@ -419,6 +467,13 @@ describe "Elixir grammar", ->
     expect(tokens[1]).toEqual value: 'test #{foo}', scopes: ['source.elixir', 'support.function.variable.quoted.single.elixir']
     expect(tokens[2]).toEqual value: '\'\'\'', scopes: ['source.elixir', 'support.function.variable.quoted.single.elixir', 'punctuation.definition.string.end.elixir']
 
+  it "tokenizes ExUnit macros", ->
+    {tokens} = grammar.tokenizeLine("describe 'some description' do")
+    expect(tokens[0]).toEqual value: 'describe', scopes: ['source.elixir', 'keyword.control.elixir']
+
+    {tokens} = grammar.tokenizeLine("test 'some assertion' do")
+    expect(tokens[0]).toEqual value: 'test', scopes: ['source.elixir', 'keyword.control.elixir']
+
   describe "word lists", ->
     it "tokenizes interpolated word lists", ->
       {tokens} = grammar.tokenizeLine('~w"#{foo} bar"')
@@ -615,3 +670,84 @@ describe "Elixir grammar", ->
 
       {tokens} = grammar.tokenizeLine('@doc ~W"""\nTest\n"""')
       expect(tokens[0]).not.toEqual value: '@doc ~W"""', scopes: ['source.elixir', 'comment.documentation.heredoc.elixir']
+
+  describe "functions", ->
+    it "tokenizes single line functions without parameters", ->
+      {tokens} = grammar.tokenizeLine('def foo, do: :ok')
+      expect(tokens[0]).toEqual value: 'def', scopes: ['source.elixir', 'keyword.control.elixir']
+      expect(tokens[1]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[2]).toEqual value: 'foo', scopes: ['source.elixir', 'entity.name.function.elixir']
+      expect(tokens[3]).toEqual value: ',', scopes: ['source.elixir', 'punctuation.separator.object.elixir']
+      expect(tokens[4]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[5]).toEqual value: 'do', scopes: ['source.elixir', 'constant.other.symbol.elixir']
+      expect(tokens[6]).toEqual value: ':', scopes: ['source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir']
+      expect(tokens[7]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[8]).toEqual value: ':', scopes: ['source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir']
+      expect(tokens[9]).toEqual value: 'ok', scopes: ['source.elixir', 'constant.other.symbol.elixir']
+
+    it "tokenizes single line functions with parameters", ->
+      {tokens} = grammar.tokenizeLine('def foo(bar, [baz: value], _opts), do: :ok')
+      expect(tokens[0]).toEqual value: 'def', scopes: ['source.elixir', 'keyword.control.elixir']
+      expect(tokens[1]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[2]).toEqual value: 'foo', scopes: ['source.elixir', 'entity.name.function.elixir']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.elixir']
+      expect(tokens[4]).toEqual value: 'bar', scopes: ['source.elixir', 'parameter.variable.function.elixir']
+      expect(tokens[5]).toEqual value: ',', scopes: ['source.elixir', 'punctuation.separator.object.elixir']
+      expect(tokens[6]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[7]).toEqual value: '[', scopes: ['source.elixir', 'punctuation.section.array.elixir']
+      expect(tokens[8]).toEqual value: 'baz', scopes: ['source.elixir', 'constant.other.symbol.elixir']
+      expect(tokens[9]).toEqual value: ':', scopes: ['source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir']
+      expect(tokens[10]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[11]).toEqual value: 'value', scopes: ['source.elixir', 'parameter.variable.function.elixir']
+      expect(tokens[12]).toEqual value: ']', scopes: ['source.elixir', 'punctuation.section.array.elixir']
+      expect(tokens[13]).toEqual value: ',', scopes: ['source.elixir', 'punctuation.separator.object.elixir']
+      expect(tokens[14]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[15]).toEqual value: '_opts', scopes: ['source.elixir', 'unused.comment.elixir']
+      expect(tokens[16]).toEqual value: ')', scopes: ['source.elixir']
+      expect(tokens[17]).toEqual value: ',', scopes: ['source.elixir', 'punctuation.separator.object.elixir']
+      expect(tokens[18]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[19]).toEqual value: 'do', scopes: ['source.elixir', 'constant.other.symbol.elixir']
+      expect(tokens[20]).toEqual value: ':', scopes: ['source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir']
+      expect(tokens[21]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[22]).toEqual value: ':', scopes: ['source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir']
+      expect(tokens[23]).toEqual value: 'ok', scopes: ['source.elixir', 'constant.other.symbol.elixir']
+
+    it "tokenizes multiline functions without parameters", ->
+      {tokens} = grammar.tokenizeLine('def foo() do\\n  :ok\\nend')
+      expect(tokens[0]).toEqual value: 'def', scopes: ['source.elixir', 'keyword.control.elixir']
+      expect(tokens[1]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[2]).toEqual value: 'foo', scopes: ['source.elixir', 'entity.name.function.elixir']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.elixir']
+      expect(tokens[4]).toEqual value: ')', scopes: ['source.elixir']
+      expect(tokens[5]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[6]).toEqual value: 'do', scopes: ['source.elixir', 'keyword.control.elixir']
+      expect(tokens[7]).toEqual value: '\\n  ', scopes: ['source.elixir']
+      expect(tokens[8]).toEqual value: ':', scopes: [ 'source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir']
+      expect(tokens[9]).toEqual value: 'ok', scopes: ['source.elixir', 'constant.other.symbol.elixir']
+      expect(tokens[10]).toEqual value: '\\nend', scopes: ['source.elixir']
+
+    it "tokenizes multiline functions with parameters", ->
+      {tokens} = grammar.tokenizeLine('def foo(bar, [baz: value], _opts) do\\n  :ok\\nend')
+      expect(tokens[0]).toEqual value: 'def', scopes: ['source.elixir', 'keyword.control.elixir']
+      expect(tokens[1]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[2]).toEqual value: 'foo', scopes: ['source.elixir', 'entity.name.function.elixir']
+      expect(tokens[3]).toEqual value: '(', scopes: ['source.elixir']
+      expect(tokens[4]).toEqual value: 'bar', scopes: ['source.elixir', 'parameter.variable.function.elixir']
+      expect(tokens[5]).toEqual value: ',', scopes: ['source.elixir', 'punctuation.separator.object.elixir']
+      expect(tokens[6]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[7]).toEqual value: '[', scopes: ['source.elixir', 'punctuation.section.array.elixir']
+      expect(tokens[8]).toEqual value: 'baz', scopes: ['source.elixir', 'constant.other.symbol.elixir']
+      expect(tokens[9]).toEqual value: ':', scopes: [ 'source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir' ]
+      expect(tokens[10]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[11]).toEqual value: 'value', scopes: ['source.elixir', 'parameter.variable.function.elixir']
+      expect(tokens[12]).toEqual value: ']', scopes: ['source.elixir', 'punctuation.section.array.elixir']
+      expect(tokens[13]).toEqual value: ',', scopes: ['source.elixir', 'punctuation.separator.object.elixir']
+      expect(tokens[14]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[15]).toEqual value: '_opts', scopes: ['source.elixir', 'unused.comment.elixir']
+      expect(tokens[16]).toEqual value: ')', scopes: ['source.elixir']
+      expect(tokens[17]).toEqual value: ' ', scopes: ['source.elixir']
+      expect(tokens[18]).toEqual value: 'do', scopes: ['source.elixir', 'keyword.control.elixir']
+      expect(tokens[19]).toEqual value: '\\n  ', scopes: ['source.elixir']
+      expect(tokens[20]).toEqual value: ':', scopes: [ 'source.elixir', 'constant.other.symbol.elixir', 'punctuation.definition.constant.elixir' ]
+      expect(tokens[21]).toEqual value: 'ok', scopes: ['source.elixir', 'constant.other.symbol.elixir']
+      expect(tokens[22]).toEqual value: '\\nend', scopes: ['source.elixir']
