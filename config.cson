@@ -38,7 +38,7 @@
   "custom-title": {}
   editor:
     fontFamily: "Fira Mono OT"
-    fontSize: 13
+    fontSize: 15
     invisibles: {}
     showInvisibles: true
   "exception-reporting":
@@ -52,6 +52,9 @@
     currentPanelHeight: "18.18713450292398vh"
   "highlight-line":
     enableBackgroundColor: false
+  "nyan-indent":
+    color: "midnight"
+    opacity: 60
   tabs:
     usePreviewTabs: true
   "trailing-spaces":
